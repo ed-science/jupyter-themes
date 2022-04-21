@@ -87,11 +87,12 @@ def install_precompiled_theme(theme):
     compiled_dir = os.path.join(styles_dir, 'compiled')
     compiled_dir_user = os.path.join(styles_dir_user, 'compiled')
 
-    if (os.path.isdir(compiled_dir_user) and
-            '{}.css'.format(theme) in os.listdir(compiled_dir_user)):
-        theme_src = os.path.join(compiled_dir_user, '{}.css'.format(theme))
+    if os.path.isdir(compiled_dir_user) and f'{theme}.css' in os.listdir(
+        compiled_dir_user
+    ):
+        theme_src = os.path.join(compiled_dir_user, f'{theme}.css')
     else:
-        theme_src = os.path.join(compiled_dir, '{}.css'.format(theme))
+        theme_src = os.path.join(compiled_dir, f'{theme}.css')
     theme_dst = os.path.join(jupyter_custom, 'custom.css')
     copyfile(theme_src, theme_dst)
 
@@ -148,16 +149,15 @@ def set_font_properties(style_less,
             style_less = import_fonts(style_less, tcfont, tcfontpath)
         else:
             tcfont='sans-serif'
-        if nbfont is not None:
-            if nbfont == 'proxima':
-                nbfont, tcfont = ["'Proxima Nova'"]*2
-                style_less = proxima_nova_imports(style_less)
-            else:
-                nbfont, nbfontpath = stored_font_dicts(nbfont)
-                style_less = import_fonts(style_less, nbfont, nbfontpath)
-        else:
+        if nbfont is None:
             nbfont='sans-serif'
 
+        elif nbfont == 'proxima':
+            nbfont, tcfont = ["'Proxima Nova'"]*2
+            style_less = proxima_nova_imports(style_less)
+        else:
+            nbfont, nbfontpath = stored_font_dicts(nbfont)
+            style_less = import_fonts(style_less, nbfont, nbfontpath)
     style_less += '/* Set Font-Type and Font-Size Variables  */\n'
     # font names and fontfamily info for codecells, notebook & textcells
     style_less += '@monofont: {}; \n'.format(monofont)
@@ -239,8 +239,9 @@ def style_layout(style_less,
     with fileOpen(theme_name_file, 'w') as f:
         f.write(theme)
 
-    if (os.path.isdir(styles_dir_user) and
-            '{}.less'.format(theme) in os.listdir(styles_dir_user)):
+    if os.path.isdir(styles_dir_user) and f'{theme}.less' in os.listdir(
+        styles_dir_user
+    ):
         theme_relpath = os.path.relpath(
             os.path.join(styles_dir_user, theme), package_dir)
     else:
@@ -276,9 +277,9 @@ def style_layout(style_less,
     if altout:
         ccOutputBG = '@notebook-bg'
     if margins != 'auto':
-        margins = '{}px'.format(margins)
+        margins = f'{margins}px'
     if '%' not in cellwidth:
-        cellwidth = str(cellwidth) + 'px'
+        cellwidth = f'{str(cellwidth)}px'
 
     style_less += '@container-margins: {};\n'.format(margins)
     style_less += '@cell-width: {}; \n'.format(cellwidth)
@@ -401,7 +402,8 @@ def set_mathjax_style(style_css, mathfontsize):
     """Write mathjax settings, set math fontsize
     """
 
-    jax_style = """<script>
+    jax_style = (
+        """<script>
     MathJax.Hub.Config({
         "HTML-CSS": {
             /*preferredFont: "TeX",*/
@@ -414,7 +416,10 @@ def set_mathjax_style(style_css, mathfontsize):
             }
         }
     });\n</script>
-    """ % (int(mathfontsize), '"{}%"'.format(str(mathfontsize)))
+    """
+        % (int(mathfontsize), f'"{str(mathfontsize)}%"')
+    )
+
 
     style_css += jax_style
     return style_css
@@ -579,4 +584,4 @@ def stored_font_dicts(fontcode, get_all=False):
         print("\n\tOne of the fonts you requested is not available\n\tSetting all fonts to default")
         return ''
     fontdir = os.sep.join([fontfam, fontdir])
-    return '"{}", {}'.format(fontname, fontfam), fontdir
+    return f'"{fontname}", {fontfam}', fontdir

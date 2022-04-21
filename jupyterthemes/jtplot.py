@@ -208,7 +208,7 @@ def set_context(context='paper', fscale=1., figsize=(8., 7.)):
     font_dict["font.family"] = ["sans-serif"]
     font_dict["font.sans-serif"] = ["Helvetica", "Helvetica Neue", "Arial",
                                 "DejaVu Sans", "Liberation Sans", "sans-serif"]
-    context_dict.update(font_dict)
+    context_dict |= font_dict
     return context_dict
 
 
@@ -241,7 +241,7 @@ def get_theme_style(theme):
 
     get_hex_code = lambda line: line.split(':')[-1].split(';')[0][-7:]
 
-    themeFile = os.path.join(styles_dir, theme+'.less')
+    themeFile = os.path.join(styles_dir, f'{theme}.less')
     with open(themeFile) as f:
         for line in f:
             for k, v  in styleMap.items():
